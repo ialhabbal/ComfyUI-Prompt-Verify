@@ -21,5 +21,6 @@ Prompt Verify is an interactive ComfyUI node that pauses a string flow and lets 
 
 Quick, and convenient text editing inside your ComfyUI flow.
 
-MIT License
+MIT License,
+
 Developed by: ialhabbal
