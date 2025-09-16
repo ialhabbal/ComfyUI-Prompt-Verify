@@ -9,7 +9,7 @@ Prompt Verify is an interactive ComfyUI node that pauses a string flow and lets 
 - Works with the built-in front-end; client and server communicate via prompt_verify_request / prompt_verify_response.
 
 ### Download Demo Video
-[![Watch the demo](media/demo-thumbnail.png)](https://github.com/ialhabbal/Comfyui-Prompt-Verify/raw/main/media/Prompt-Verify.mp4)
+[![Watch the demo](media/demo-thumbnail.png)](https://github.com/ialhabbal/ComfyUI-Prompt-Verify/blob/main/media/Promp-Verify.mp4)
 
 ## How to install
 1. Open ComfyUI Custom Nodes folder
