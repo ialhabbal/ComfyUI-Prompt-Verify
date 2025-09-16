@@ -8,6 +8,13 @@ Prompt Verify is an interactive ComfyUI node that pauses a string flow and lets 
 - Configurable timeout (default 60s, max 2400s). If the timeout elapses, the current text is sent automatically.
 - Works with the built-in front-end; client and server communicate via prompt_verify_request / prompt_verify_response.
 
+## How to install
+1. Open ComfyUI Custom Nodes folder
+2. Open a terminal window (cmd)
+3. Type this: https://github.com/ialhabbal/ComfyUI-Prompt-Verify.git
+4. Restart ComfyUI
+5. Search for the node: Prompt Verify
+
 ## How to use
 1. Connect a STRING input to the node's `text` socket. (i.e. florence2 Captioner)
 2. (Optional) Provide initial text in the `editor` field to prefill the editor.
