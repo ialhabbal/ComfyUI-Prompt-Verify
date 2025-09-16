@@ -11,5 +11,5 @@ Repository = "https://github.com/ialhabbal/comfyui-prompt-verify"
 [tool.comfy]
 PublisherId = "ialhabbal"
 DisplayName = "ComfyUI Prompt Verify"
-Icon = "https://github.com/ialhabbal/comfyui-prompt-verify/blob/main/media/prompt-verify.png?raw=true"
+Icon = "https://github.com/ialhabbal/comfyui-prompt-verify/blob/main/media/Prompt-Verify.png?raw=true"
 includes = []
