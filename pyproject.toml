@@ -1,0 +1,15 @@
+[project]
+name = "comfyui-prompt-verify"
+description = "Custom node to pause a string flow/prompt and let you edit the text"
+version = "0.0.1"
+license = { file = "LICENSE" }
+dependencies = []
+
+[project.urls]
+Repository = "https://github.com/ialhabbal/comfyui-prompt-verify"
+
+[tool.comfy]
+PublisherId = "ialhabbal"
+DisplayName = "ComfyUI Prompt Verify"
+Icon = "https://github.com/ialhabbal/comfyui-prompt-verify/blob/main/media/prompt-verify.png?raw=true"
+includes = []
