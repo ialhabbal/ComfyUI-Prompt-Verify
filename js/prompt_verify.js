@@ -68,6 +68,7 @@ function prompt_verify_request(msg) {
     console.debug('prompt_verify: received prompt_verify_request', msg.detail)
     const nodeId = msg.detail.node_id
     const timeup = !!msg.detail.timeup
+    const panelDefaults = msg.detail && msg.detail.panel_defaults ? msg.detail.panel_defaults : {}
     // create or find floating editor for this node id
     const floatId = `prompt_verify_float_${nodeId}`
     let panel = document.getElementById(floatId)
@@ -157,6 +158,7 @@ function prompt_verify_request(msg) {
             panel.appendChild(handle)
 
             let startX=0, startY=0, startLeft=0, startTop=0, dragging=false
+            let _dragPointerId = null
             const onPointerMove = (ev) => {
                 if (!dragging) return
                 const clientX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX)
@@ -176,6 +178,10 @@ function prompt_verify_request(msg) {
                 dragging = false
                 window.removeEventListener('pointermove', onPointerMove)
                 window.removeEventListener('pointerup', onPointerUp)
+                window.removeEventListener('pointercancel', onPointerUp)
+                try { if (panel._prevTransition !== undefined) panel.style.transition = panel._prevTransition } catch(e){}
+                try { if (_dragPointerId != null && handle.releasePointerCapture) handle.releasePointerCapture(_dragPointerId) } catch(e){}
+                _dragPointerId = null
                 // save position
                 const left = parseInt(panel.style.left,10) || panel.getBoundingClientRect().left
                 const top = parseInt(panel.style.top,10) || panel.getBoundingClientRect().top
@@ -187,6 +193,9 @@ function prompt_verify_request(msg) {
 
             handle.addEventListener('pointerdown', (ev)=>{
                 ev.preventDefault()
+                try { if (ev.target && ev.target.setPointerCapture) { ev.target.setPointerCapture(ev.pointerId); _dragPointerId = ev.pointerId } } catch(e){}
+                // disable transitions during interactive dragging for snappy movement
+                try { panel._prevTransition = panel.style.transition; panel.style.transition = 'none' } catch(e){}
                 dragging = true
                 startX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX)
                 startY = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] && ev.touches[0].clientY)
@@ -195,11 +204,12 @@ function prompt_verify_request(msg) {
                 startTop = rect.top
                 window.addEventListener('pointermove', onPointerMove)
                 window.addEventListener('pointerup', onPointerUp)
+                window.addEventListener('pointercancel', onPointerUp)
             })
     } catch(e) { console.debug('prompt_verify: makePanelDraggable failed', e) }
     }
 
-    function makePanelResizable(panel, nodeId, textarea) {
+    function makePanelResizable(panel, nodeId, textarea, panelDefaults) {
         try {
             const grip = document.createElement('div')
             grip.title = 'Resize'
@@ -208,7 +218,9 @@ function prompt_verify_request(msg) {
             panel.appendChild(grip)
 
             let startX=0, startY=0, startW=0, startH=0, resizing=false
-            const minW = 320, minH = 120
+            let _resizePointerId = null
+            const minW = (panelDefaults && typeof panelDefaults.min_w === 'number') ? panelDefaults.min_w : 320
+            const minH = (panelDefaults && typeof panelDefaults.min_h === 'number') ? panelDefaults.min_h : 120
             const onPointerMove = (ev) => {
                 if (!resizing) return
                 const clientX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX)
@@ -226,9 +238,9 @@ function prompt_verify_request(msg) {
                 // update textarea to fill available space (approx)
                 try {
                     if (textarea) {
-                        const padX = 24 // approximate horizontal padding/margins
-                        const padY = 80 // space for buttons and padding
-                        textarea.style.width = `${Math.max(100, newW - padX)}px`
+                        const padY = (panelDefaults && typeof panelDefaults.pad_y === 'number') ? panelDefaults.pad_y : 80 // space for buttons and padding
+                        // textarea takes full width of panel, height reduced by controls
+                        textarea.style.width = '100%'
                         textarea.style.height = `${Math.max(60, newH - padY)}px`
                     }
                 } catch(e){}
@@ -238,6 +250,10 @@ function prompt_verify_request(msg) {
                 resizing = false
                 window.removeEventListener('pointermove', onPointerMove)
                 window.removeEventListener('pointerup', onPointerUp)
+                window.removeEventListener('pointercancel', onPointerUp)
+                try { if (panel._prevTransition !== undefined) panel.style.transition = panel._prevTransition } catch(e){}
+                try { if (_resizePointerId != null && grip.releasePointerCapture) grip.releasePointerCapture(_resizePointerId) } catch(e){}
+                _resizePointerId = null
                 // persist
                 const rect = panel.getBoundingClientRect()
                 savePanelSize(nodeId, rect.width, rect.height)
@@ -248,6 +264,9 @@ function prompt_verify_request(msg) {
 
             grip.addEventListener('pointerdown', (ev)=>{
                 ev.preventDefault()
+                try { if (ev.target && ev.target.setPointerCapture) { ev.target.setPointerCapture(ev.pointerId); _resizePointerId = ev.pointerId } } catch(e){}
+                // disable transition during interactive resize for snappy response
+                try { panel._prevTransition = panel.style.transition; panel.style.transition = 'none' } catch(e){}
                 resizing = true
                 startX = ev.clientX != null ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX)
                 startY = ev.clientY != null ? ev.clientY : (ev.touches && ev.touches[0] && ev.touches[0].clientY)
@@ -256,6 +275,7 @@ function prompt_verify_request(msg) {
                 startH = rect.height
                 window.addEventListener('pointermove', onPointerMove)
                 window.addEventListener('pointerup', onPointerUp)
+                window.addEventListener('pointercancel', onPointerUp)
             })
 
             // when textarea exists, disable its native resize to avoid double-resize UI
@@ -268,9 +288,11 @@ function prompt_verify_request(msg) {
     if (!panel) {
         panel = document.createElement('div')
         panel.id = floatId
-    panel.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:999999;background:#111;padding:12px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.5);color:#fff;max-width:520px;'
+    // make panel sizing fluid but constrained
+    panel.style.cssText = 'position:fixed;right:16px;bottom:16px;z-index:999999;background:#111;padding:12px;border-radius:8px;box-shadow:0 8px 30px rgba(0,0,0,0.5);color:#fff;max-width:520px;box-sizing:border-box;'
         const ta = document.createElement('textarea')
-        ta.style.cssText = 'width:480px;height:160px;padding:8px;border-radius:6px;border:1px solid #444;background:#0f0f0f;color:#fff;resize:vertical;'
+        // fluid textarea that wraps long words and will be auto-resized to content
+        ta.style.cssText = 'width:100%;height:160px;padding:8px;border-radius:6px;border:1px solid #444;background:#0f0f0f;color:#fff;box-sizing:border-box;white-space:pre-wrap;word-break:break-word;overflow-wrap:break-word;resize:none;'
         const btn = document.createElement('button')
         btn.type = 'button'
         btn.textContent = 'Submit'
@@ -284,6 +306,8 @@ function prompt_verify_request(msg) {
         panel.appendChild(btn)
         panel.appendChild(close)
         document.body.appendChild(panel)
+        // enable a subtle transition for moves/resizes (restorable when interacting)
+        try { panel._defaultTransition = 'left 120ms ease, top 120ms ease, width 120ms ease, height 120ms ease'; panel.style.transition = panel._defaultTransition } catch(e){}
         // if user previously moved this node's panel, restore that position (non-destructive)
         try {
             const saved = getSavedPanelPos(nodeId)
@@ -301,6 +325,20 @@ function prompt_verify_request(msg) {
         // make panel draggable so user can move it; movement will clear anchoring
         try { makePanelDraggable(panel, nodeId) } catch(e){ }
 
+        // auto-resize textarea to content so panel fits the text on open
+        function autoResizeTextarea() {
+            try {
+                ta.style.height = 'auto'
+                // small extra offset so scrollHeight isn't clipped
+                const h = Math.max(60, ta.scrollHeight + 2)
+                ta.style.height = h + 'px'
+            } catch(e){}
+        }
+        // live-update when user types
+        ta.addEventListener('input', ()=>{
+            autoResizeTextarea()
+        })
+
         // restore saved size if present
         try {
             const savedSize = getSavedPanelSize(nodeId)
@@ -308,11 +346,24 @@ function prompt_verify_request(msg) {
                 panel.style.width = `${Math.max(200, savedSize.w)}px`
                 panel.style.height = `${Math.max(120, savedSize.h)}px`
                 console.debug('prompt_verify: restored saved panel size', {nodeId, savedSize})
+            } else {
+                // if no saved size, apply defaults from the node (if provided)
+                try {
+                    if (panelDefaults && typeof panelDefaults.w === 'number') panel.style.width = `${Math.max(200, panelDefaults.w)}px`
+                    if (panelDefaults && typeof panelDefaults.h === 'number') panel.style.height = `${Math.max(120, panelDefaults.h)}px`
+                    // if a default height was provided, make textarea match (respect pad)
+                    try {
+                        if (panelDefaults && typeof panelDefaults.h === 'number' && ta) {
+                            const padY = (panelDefaults && typeof panelDefaults.pad_y === 'number') ? panelDefaults.pad_y : 80
+                            ta.style.height = `${Math.max(60, panelDefaults.h - padY)}px`
+                        }
+                    } catch(e){}
+                } catch(e){}
             }
         } catch(e){}
 
-        // wire up resizer (pass textarea so it can be resized accordingly)
-        try { makePanelResizable(panel, nodeId, ta) } catch(e){}
+        // wire up resizer (pass textarea and panelDefaults so sizing/padding can be customized)
+        try { makePanelResizable(panel, nodeId, ta, panelDefaults) } catch(e){}
 
         // try to position near node; if success, keep fixed placement (unless user had saved pos)
     const anchored = (!panel.dataset.anchored || panel.dataset.anchored!=='0') && positionPanelNearNode(panel, nodeId)
@@ -335,7 +386,14 @@ function prompt_verify_request(msg) {
     }
     // set text into textarea and focus; if anchored, re-run positioning after render
     const ta = panel.querySelector('textarea')
-    if (ta) { ta.value = msg.detail.message || ''; ta.focus(); }
+    if (ta) {
+        ta.value = msg.detail.message || '';
+        // auto-size height to content and ensure textarea wraps long lines
+        try { ta.style.height = 'auto'; ta.style.height = (ta.scrollHeight + 2) + 'px' } catch(e){}
+        try { ta.focus() } catch(e){}
+        // ensure panel width is not oversized when content is narrow
+        try { panel.style.width = panel.style.width || 'auto' } catch(e){}
+    }
     if (panel.dataset.anchored === '1') positionPanelNearNode(panel, nodeId)
 }
 
