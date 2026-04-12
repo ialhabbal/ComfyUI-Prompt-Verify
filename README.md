@@ -21,7 +21,6 @@ Prompt Verify is an interactive ComfyUI node that pauses a string flow and lets 
 
 ### In-node text passthrough
 ![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/in_node_text_passthrough.png)
-![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/in_node_text_passthrough_1.png)
 
 ## How to install
 1. Open ComfyUI Custom Nodes folder
