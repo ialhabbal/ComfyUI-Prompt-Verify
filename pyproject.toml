@@ -1,7 +1,7 @@
 [project]
 name = "comfyui-prompt-verify"
-description = "Custom node to pause a string flow/prompt and let you edit the text"
-version = "0.0.1"
+description = "Custom node to pause a string flow/prompt and let you edit the prompt text"
+version = "1.0.0"
 license = { file = "LICENSE" }
 dependencies = []
 
