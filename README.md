@@ -106,6 +106,8 @@ Connect an LLM node (e.g. one that expands a short idea into a detailed image de
 **Fully automated with a safety window:**
 Set a short timeout (e.g. 15 seconds) and leave your preferred prompt in the `editor` widget. The popup will appear briefly each run, but if you don't intervene, it auto-submits and generation continues uninterrupted. You only need to act when something looks wrong.
 
+### The Node
+![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/the_node.png)
 
 ### The Node in Action
 ![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/workflow.png)
