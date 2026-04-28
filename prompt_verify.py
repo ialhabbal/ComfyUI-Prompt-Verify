@@ -23,11 +23,6 @@ class PromptVerify:
                 "text" : ( "STRING", {"forceInput":True, "lazy": True}),
                 "llm_input": ("STRING", {"multiline": True, "forceInput": True, "lazy": True, "tooltip": "Connect LLM text input here"}),
                 "editor": ("STRING", {"default":"", "multiline":True, "tooltip":"edit here, press 'shift-return' to submit"}),
-                "panel_default_width": ("INT", {"default":520, "min":200, "max":1600, "step":1}),
-                "panel_default_height": ("INT", {"default":160, "min":80, "max":1200, "step":1}),
-                "panel_min_width": ("INT", {"default":320, "min":100, "max":1200, "step":1}),
-                "panel_min_height": ("INT", {"default":120, "min":60, "max":1200, "step":1}),
-                "panel_pad_y": ("INT", {"default":80, "min":0, "max":400, "step":1}),
             },
             "hidden": {"node_id":"UNIQUE_ID"},
         }
@@ -41,10 +36,7 @@ class PromptVerify:
         return needed
 
     def func(self, use_external_text_input, use_llm_input, timeout, node_id,
-             text=None, llm_input=None, editor=None,
-             panel_default_width=520, panel_default_height=160,
-             panel_min_width=320, panel_min_height=120, panel_pad_y=80,
-             clip=None):
+             text=None, llm_input=None, editor=None, clip=None):
 
         # Handle input selection logic
         if not use_external_text_input:
@@ -71,13 +63,6 @@ class PromptVerify:
                 "node_id": node_id,
                 "message": text,
                 "timeup": False,
-                "panel_defaults": {
-                    "w": int(panel_default_width) if panel_default_width is not None else None,
-                    "h": int(panel_default_height) if panel_default_height is not None else None,
-                    "min_w": int(panel_min_width) if panel_min_width is not None else None,
-                    "min_h": int(panel_min_height) if panel_min_height is not None else None,
-                    "pad_y": int(panel_pad_y) if panel_pad_y is not None else None,
-                }
             })
 
             endat = time.monotonic() + timeout
@@ -89,13 +74,6 @@ class PromptVerify:
                 PromptServer.instance.send_sync("prompt_verify_request", {
                     "node_id": node_id,
                     "timeup": True,
-                    "panel_defaults": {
-                        "w": int(panel_default_width) if panel_default_width is not None else None,
-                        "h": int(panel_default_height) if panel_default_height is not None else None,
-                        "min_w": int(panel_min_width) if panel_min_width is not None else None,
-                        "min_h": int(panel_min_height) if panel_min_height is not None else None,
-                        "pad_y": int(panel_pad_y) if panel_pad_y is not None else None,
-                    }
                 })
 
                 endat = time.monotonic() + 5
