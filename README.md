@@ -109,6 +109,9 @@ Set a short timeout (e.g. 15 seconds) and leave your preferred prompt in the `ed
 ### The Node
 ![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/the_node.png)
 
+### The Floating Window
+![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/floating_window.png)
+
 ### The Node in Action
 ![ComfyUI-Prompt-Verify Node](https://raw.githubusercontent.com/ialhabbal/ComfyUI-Prompt-Verify/main/media/workflow.png)
 
